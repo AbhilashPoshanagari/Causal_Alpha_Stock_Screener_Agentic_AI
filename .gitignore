@@ -1,0 +1,9 @@
+/fast_api/__pycache__/agent_ai.cpython-310.pyc
+/fast_api/__pycache__/extract_features.cpython-310.pyc
+/fast_api/__pycache__/global_state.cpython-310.pyc
+/fast_api/__pycache__/lstm_predict.cpython-310.pyc
+/fast_api/__pycache__/main.cpython-310.pyc
+.env
+/fast_api/llm/__pycache__/*
+/fast_api/streaming/__pycache__/*
+/fast_api/mlruns/*
