@@ -13,12 +13,11 @@ import pandas as pd
 from fastapi.responses import JSONResponse
 from mlflow.tracking import MlflowClient
 from agent_ai import predict_llm
-import asyncio
 app = FastAPI()
 
 client = MlflowClient()
 origins:list = [
-    "http://127.0.0.1:4200"
+    "http://127.0.0.1:4200",
     "http://localhost:4200",
     "http://localhost:8080",
 ]
