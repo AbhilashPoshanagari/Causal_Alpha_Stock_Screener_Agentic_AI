@@ -349,8 +349,11 @@ def get_ticker_price_data(
     # Fetch fresh
     df, nifty = get_stock_data(ticker, start_date, end_date)
     history = serialize_dataframe(df)
+    nifty_history = serialize_dataframe(nifty)
+    cache.setdefault("^NSEI",{})['price_history'] = nifty_history
     cache.setdefault(ticker, {})['price_history'] = history
     cache[ticker]['last_updated'] = datetime.utcnow().isoformat()
+    cache["^NSEI"]['last_updated'] = datetime.utcnow().isoformat()
     save_price_cache(cache)
     return df, history, nifty
 
@@ -410,11 +413,11 @@ def plot_price_charts(stock_data: pd.DataFrame, ticker: str, nifty_data: Optiona
     fig5.show()
 
     return {
-        "price_chart": fig1,
-        "bollinger_chart": fig2,
-        "rsi_chart": fig3,
-        "volatility_chart": fig4,
-        "macd_chart": fig5
+        "price_chart": fig1.to_plotly_json(),
+        "bollinger_chart": fig2.to_plotly_json(),
+        "rsi_chart": fig3.to_plotly_json(),
+        "volatility_chart": fig4.to_plotly_json(),
+        "macd_chart": fig5.to_plotly_json()
     }
 
 """## 7. LLM Cache Implementation
@@ -1224,6 +1227,7 @@ def display_plots_from_price_cache(ticker):
                     }, index=dates)
 
                     nifty_data = yf.download("^NSEI", start=dates[0], end=dates[-1] + timedelta(days=1))
+                    # nifty_data = pd.read_csv("../../nifty_data_cleaned.csv")
                     # print(f"Displaying charts for {ticker} based on cached data")
                     plots = plot_price_charts(stock_data, ticker, nifty_data)
                     # return plots["price_chart"], plots["bollinger_chart"], plots["rsi_chart"], plots["volatility_chart"]
@@ -1455,8 +1459,8 @@ def gradio_predict(stock_ticker, analysis_type, n_runs, check_similarity, simila
 
       stock_results = update_all_tabs_2(md[0], stock_ticker )
       plots = display_plots_from_price_cache(stock_ticker)
-    #   return (*stock_results, eval_log_path, sim_log_path, plots["price_chart"], plots["bollinger_chart"], plots["rsi_chart"], plots["volatility_chart"], plots["macd_chart"] )
-      return (*stock_results, eval_log_path, sim_log_path )
+      return (*stock_results, eval_log_path, sim_log_path, plots["price_chart"], plots["bollinger_chart"], plots["rsi_chart"], plots["volatility_chart"], plots["macd_chart"] )
+    #   return (*stock_results, eval_log_path, sim_log_path )
     except Exception as e:
         error_msg = f"⚠️ Error: {str(e)}"
         print(error_msg)

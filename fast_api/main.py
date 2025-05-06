@@ -105,7 +105,12 @@ async def llm_predict(req: PredictRequest):
             req.stock_ticker, req.analysis_type, req.n_runs, req.check_similarity, req.similarity_threshold,
             req.compare_fields, req.use_cache, req.show_similarity_summary, req.add_weights,
             req.macro_weight_val, req.sector_weight_val, req.tech_weight_val)
-        return JSONResponse(content={"status": 200, "data": response})
+        return JSONResponse(content={"status": 200, "data": {"macro_analysis": response[0],
+                                 "sector_and_company_analysis": response[1],
+                                 "technical_analysis": response[2],
+                                 "final_synthesis": response[3],
+                                 "eval_log_path": response[4],
+                                 "sim_log_path": response[5]}})
     except Exception as e:
         return JSONResponse(content={"status": 500, "error": str(e)})
 
