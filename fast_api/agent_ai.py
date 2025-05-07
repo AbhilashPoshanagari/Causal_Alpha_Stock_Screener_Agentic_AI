@@ -1,4 +1,4 @@
-from llm.team_2_stock_recommendation_agentic_v6_all_agent_logged import gradio_predict
+from team_2_stock_recommendation_agentic_v6_all_agent_logged import gradio_predict
 
 def predict_llm(stock_ticker, analysis_type, n_runs, check_similarity, similarity_threshold,
                             compare_fields, use_cache, show_similarity_summary, add_weights,

@@ -1,4 +1,5 @@
 import asyncio
+from pathlib import Path
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from streaming.kafka_consumer import consumer_msg, get_consumer
@@ -14,7 +15,29 @@ from fastapi.responses import JSONResponse
 from mlflow.tracking import MlflowClient
 from agent_ai import predict_llm
 import asyncio
+from fastapi.staticfiles import StaticFiles
+import os
+from fastapi import HTTPException
+from datetime import datetime, timedelta, date
+
 app = FastAPI()
+app.mount("/content", StaticFiles(directory=os.path.abspath("content")), name="content")
+CONTENT_DIR = Path(os.path.abspath("content"))
+
+
+def get_file_metadata(file_path: str):
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"{file_path} does not exist")
+
+    stats = os.stat(file_path)
+    relative_path = file_path.relative_to(CONTENT_DIR)
+    url_path = f"/content/{relative_path.as_posix()}"
+
+    return {
+        "file_path": url_path,
+        "size_bytes": stats.st_size,
+        "last_modified": datetime.fromtimestamp(stats.st_mtime).isoformat()
+    }
 
 client = MlflowClient()
 origins:list = [
@@ -99,18 +122,30 @@ def get_all_users(ip: IP):
 @app.post("/llm/predict")
 async def llm_predict(req: PredictRequest):
     try:
-        print(f"data : ", req)
+        # print(f"data : ", req)
         response = await asyncio.to_thread(
             predict_llm,
             req.stock_ticker, req.analysis_type, req.n_runs, req.check_similarity, req.similarity_threshold,
             req.compare_fields, req.use_cache, req.show_similarity_summary, req.add_weights,
             req.macro_weight_val, req.sector_weight_val, req.tech_weight_val)
+        
+        try:
+            eval_log_file = get_file_metadata(response[4])
+            sim_log_file = get_file_metadata(response[5])
+        except FileNotFoundError as e:
+            raise HTTPException(status_code=404, detail=str(e))
+
         return JSONResponse(content={"status": 200, "data": {"macro_analysis": response[0],
                                  "sector_and_company_analysis": response[1],
                                  "technical_analysis": response[2],
                                  "final_synthesis": response[3],
-                                 "eval_log_path": response[4],
-                                 "sim_log_path": response[5]}})
+                                 "eval_log_path": eval_log_file,
+                                 "sim_log_path": sim_log_file,
+                                 "price_chart": response[6],
+                                 "bollinger_chart": response[7],
+                                 "rsi_chart": response[8],
+                                 "volatility_chart": response[9],
+                                 "macd_chart": response[10]}})
     except Exception as e:
         return JSONResponse(content={"status": 500, "error": str(e)})
 
