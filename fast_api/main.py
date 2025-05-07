@@ -18,7 +18,7 @@ import asyncio
 from fastapi.staticfiles import StaticFiles
 import os
 from fastapi import HTTPException
-from datetime import datetime, timedelta, date
+from datetime import datetime
 
 app = FastAPI()
 app.mount("/content", StaticFiles(directory=os.path.abspath("content")), name="content")
@@ -41,7 +41,7 @@ def get_file_metadata(file_path: str):
 
 client = MlflowClient()
 origins:list = [
-    "http://127.0.0.1:4200"
+    "http://127.0.0.1:4200",
     "http://localhost:4200",
     "http://localhost:8080",
 ]
