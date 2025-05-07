@@ -19,6 +19,7 @@ from fastapi.staticfiles import StaticFiles
 import os
 from fastapi import HTTPException
 from datetime import datetime
+from team_2_stock_recommendation_agentic_v6_all_agent_logged import gradio_predict
 
 app = FastAPI()
 app.mount("/content", StaticFiles(directory=os.path.abspath("content")), name="content")
@@ -124,7 +125,7 @@ async def llm_predict(req: PredictRequest):
     try:
         # print(f"data : ", req)
         response = await asyncio.to_thread(
-            predict_llm,
+            gradio_predict,
             req.stock_ticker, req.analysis_type, req.n_runs, req.check_similarity, req.similarity_threshold,
             req.compare_fields, req.use_cache, req.show_similarity_summary, req.add_weights,
             req.macro_weight_val, req.sector_weight_val, req.tech_weight_val)
