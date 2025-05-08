@@ -870,9 +870,9 @@ def run_stock_outlook(
                         'Lower_Band': price_cache[ticker]["price_history"]["indicators"]["lower_band"]
                     }, index=dates)
 
-                    # nifty_data = yf.download("^NSEI", start=dates[0], end=dates[-1] + timedelta(days=1))
-                    nifty_data = pd.read_csv(NIFTY_50_PATH)
-                    print(f"Displaying charts for {ticker} based on cached data")
+                    nifty_data = yf.download("^NSEI", start=dates[0], end=dates[-1] + timedelta(days=1))
+                    # nifty_data = pd.read_csv(NIFTY_50_PATH)
+                    # print(f"Displaying charts for {ticker} based on cached data")
                     plot_price_charts(stock_data, ticker, nifty_data)
             except Exception as e:
                 print(f"Error displaying charts from cached data: {e}")
@@ -933,7 +933,7 @@ def run_stock_outlook(
             }, index=dates)
 
             nifty_data = yf.download("^NSEI", start=dates[0], end=dates[-1] + timedelta(days=1))
-            print(f"Displaying charts for {ticker}")
+            # print(f"Displaying charts for {ticker}")
             plot_price_charts(stock_data, ticker, nifty_data)
     except Exception as e:
         print(f"Error displaying charts: {e}")
@@ -1246,13 +1246,10 @@ def display_plots_from_price_cache(ticker):
                         'Upper_Band': price_cache[ticker]["price_history"]["indicators"]["upper_band"],
                         'Lower_Band': price_cache[ticker]["price_history"]["indicators"]["lower_band"]
                     }, index=dates)
-                    # try:
-                    #     nifty_data = yf.download("^NSEI", start=dates[0], end=dates[-1] + timedelta(days=1))
-                    # except Exception as e:
-                    nifty_data = pd.read_csv(NIFTY_50_PATH)
-                    # nifty_data = pd.read_csv("../../nifty_data_cleaned.csv")
+
+                    nifty_data = yf.download("^NSEI", start=dates[0], end=dates[-1] + timedelta(days=1))
                     # print(f"Displaying charts for {ticker} based on cached data")
-                    plots = plot_price_charts(stock_data, ticker)
+                    plots = plot_price_charts(stock_data, ticker, nifty_data)
                     # return plots["price_chart"], plots["bollinger_chart"], plots["rsi_chart"], plots["volatility_chart"]
                     return {
                             "price_chart": pio.to_json(plots["price_chart"]),
