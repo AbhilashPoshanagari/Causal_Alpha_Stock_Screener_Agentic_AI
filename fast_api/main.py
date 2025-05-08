@@ -129,7 +129,7 @@ async def llm_predict(req: PredictRequest):
             req.stock_ticker, req.analysis_type, req.n_runs, req.check_similarity, req.similarity_threshold,
             req.compare_fields, req.use_cache, req.show_similarity_summary, req.add_weights,
             req.macro_weight_val, req.sector_weight_val, req.tech_weight_val)
-        
+        print("eval path : ", response[4], " sim path : ", response[5])
         try:
             eval_log_file = get_file_metadata(response[4])
             sim_log_file = get_file_metadata(response[5])

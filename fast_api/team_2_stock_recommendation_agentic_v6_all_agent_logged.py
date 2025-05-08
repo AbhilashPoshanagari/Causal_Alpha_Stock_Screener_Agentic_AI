@@ -362,11 +362,11 @@ def get_ticker_price_data(
     # Fetch fresh
     df, nifty = get_stock_data(ticker, start_date, end_date)
     history = serialize_dataframe(df)
-    nifty_history = serialize_dataframe(nifty)
-    cache.setdefault("^NSEI",{})['price_history'] = nifty_history
+    # nifty_history = serialize_dataframe(nifty)
+    # cache.setdefault("^NSEI",{})['price_history'] = nifty_history
     cache.setdefault(ticker, {})['price_history'] = history
     cache[ticker]['last_updated'] = datetime.utcnow().isoformat()
-    cache["^NSEI"]['last_updated'] = datetime.utcnow().isoformat()
+    # cache["^NSEI"]['last_updated'] = datetime.utcnow().isoformat()
     save_price_cache(cache)
     return df, history, nifty
 
@@ -963,6 +963,7 @@ def log_run(ticker, prompt_id, agent, output_text, recommendation):
         df_existing = pd.concat([df_existing, df_entry], ignore_index=True)
     except FileNotFoundError:
         df_existing = df_entry
+    print(f'eval log path : {log_path}')
     df_existing.to_csv(log_path, index=False)
     print(f"Logged run: {run_id}")
     return run_id
@@ -970,6 +971,7 @@ def log_run(ticker, prompt_id, agent, output_text, recommendation):
 def log_similarity_pairwise(ticker, field, run_id_1, run_id_2, similarity, threshold=0.9):
     """Log similarity between a pair of runs."""
     log_path = SIMILARITY_LOG_PATH
+
     entry = {
         "ticker": ticker,
         "field": field,
@@ -1105,6 +1107,7 @@ def predict(
         display_parts.append(f"**Summary**:\n{final['final_research_summary']}")
     if weights:
         display_parts.append(f"**Manual Weights Applied**: {json.dumps(weights, indent=2)}")
+
     return "\n\n".join(display_parts) + similarity_log, EVALUATION_LOG_PATH, SIMILARITY_LOG_PATH
 
 """## 14. Batch Runner & Log Summaries
